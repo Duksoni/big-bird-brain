@@ -9,20 +9,24 @@
     "tauri": "tauri"
   },
   "private": true,
+  "packageManager": "bun",
   "dependencies": {
     "@angular/animations": "^21.2.11",
+    "@angular/cdk": "^21.2.9",
     "@angular/common": "^21.2.11",
     "@angular/compiler": "^21.2.11",
     "@angular/core": "^21.2.11",
     "@angular/forms": "^21.2.11",
+    "@angular/material": "^21.2.9",
     "@angular/platform-browser": "^21.2.11",
     "@angular/platform-browser-dynamic": "^21.2.11",
     "@angular/router": "^21.2.11",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-log": "^2.8.0",
+    "@tauri-apps/plugin-opener": "^2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.16.1",
-    "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-opener": "^2"
+    "zone.js": "~0.16.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^21.2.9",
