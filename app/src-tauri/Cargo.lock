@@ -3349,9 +3349,9 @@ dependencies = [
 
 [[package]]
 name = "rust-rule-engine"
-version = "1.20.1"
+version = "1.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3aa739bac8cd279f3cadd89ce2ed5e2e0c1bc4ba2aea5cf201a1d14a3a7c7621"
+checksum = "d39dc23c82157d7c808f273ef3c5b14773f9f40e258ad942ea3f5da1ce619b87"
 dependencies = [
  "chrono",
  "log",
