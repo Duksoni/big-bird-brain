@@ -1,21 +1,10 @@
 use anyhow::Context;
-use sqlx::SqlitePool;
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use sqlx::{
+    SqlitePool,
+    sqlite::{SqliteConnectOptions, SqlitePoolOptions},
+};
 use std::str::FromStr;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
-pub fn init_tracing(crate_name: &str) {
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| format!("{}=debug", crate_name).into()),
-        )
-        .with(
-            tracing_subscriber::fmt::layer()
-                .with_timer(tracing_subscriber::fmt::time::UtcTime::rfc_3339()),
-        )
-        .init();
-}
+use tauri::{App, Manager};
 
 pub async fn init_db(connection_string: &str) -> anyhow::Result<SqlitePool> {
     let options = SqliteConnectOptions::from_str(connection_string)?.create_if_missing(true);
@@ -26,4 +15,34 @@ pub async fn init_db(connection_string: &str) -> anyhow::Result<SqlitePool> {
         .await
         .context("Failed to connect to DB")?;
     Ok(pool)
+}
+
+pub fn setup_app(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
+    let app_handle = app.handle().clone();
+
+    tauri::async_runtime::block_on(async move {
+        let app_dir = app_handle
+            .path()
+            .app_data_dir()
+            .expect("failed to get app data dir");
+        if !app_dir.exists() {
+            std::fs::create_dir_all(&app_dir).expect("failed to create app data dir");
+        }
+
+        let db_path = app_dir.join("data.db");
+        let connection_string = format!("sqlite:{}", db_path.display());
+
+        let pool = init_db(&connection_string)
+            .await
+            .expect("failed to init db");
+
+        sqlx::migrate!("./migrations")
+            .run(&pool)
+            .await
+            .expect("failed to run migrations");
+
+        app_handle.manage(pool);
+    });
+
+    Ok(())
 }
