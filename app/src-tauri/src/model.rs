@@ -1,6 +1,7 @@
 mod bird;
 mod bird_power;
 mod bonus;
+mod game_state;
 mod goal;
 mod habitat;
 mod nest_type;
@@ -11,6 +12,7 @@ mod round;
 pub use bird::*;
 pub use bird_power::*;
 pub use bonus::*;
+pub use game_state::*;
 pub use goal::*;
 pub use habitat::*;
 pub use nest_type::*;
