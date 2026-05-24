@@ -41,3 +41,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Downloaded the project locally to get better source code inspection
+rust-rule-engine/
