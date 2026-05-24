@@ -1,3 +1,4 @@
+mod error;
 mod setup;
 
 use setup::*;
@@ -24,9 +25,7 @@ pub fn run() {
         )
         .plugin(tauri_plugin_opener::init())
         .setup(setup_app)
-        .invoke_handler(tauri::generate_handler![
-            greet,
-        ])
+        .invoke_handler(tauri::generate_handler![greet,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
