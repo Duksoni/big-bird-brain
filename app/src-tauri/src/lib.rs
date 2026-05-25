@@ -1,5 +1,6 @@
 mod error;
 mod model;
+mod rule_engine;
 mod setup;
 
 use setup::*;
