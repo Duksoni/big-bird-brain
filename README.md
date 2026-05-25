@@ -314,104 +314,96 @@ Ova pravila se aktiviraju isključivo u _Draft Phase_ i evaluiraju inicijalnu ru
 ### Nivo 1 - Osnovno izvođenje činjenica
 
 ```
-rule "DetectTurn1PlayableBird" {
+rule "DetectActivationPowerBird" no-loop {
     when
-        DraftCombination.PlayableBirdCount > 0
+        DraftCombination.has_brown_or_pink_power_bird == true
     then
-        DraftCombination.addFact("TURN1_PLAYABLE");
-        log("Opening has a playable bird on turn 1");
-}
-
-rule "DetectCheapBird" {
-    when
-        DraftCombination.CheapBirdCount > 0
-    then
-        DraftCombination.addFact("CHEAP_BIRD");
-        log("Opening contains cheap early-game bird");
-}
-
-rule "DetectCardDrawEngine" {
-    when
-        DraftCombination.HasWetlandsCardDrawBird == true
-    then
-        DraftCombination.addFact("CARD_ENGINE");
-        log("Wetlands card draw engine detected");
-}
-
-rule "DetectFoodEngine" {
-    when
-        DraftCombination.HasFoodGenerationBird == true
-    then
-        DraftCombination.addFact("FOOD_ENGINE");
-        log("Food engine detected");
-}
-
-rule "DetectRavenEngine" {
-    when
-        DraftCombination.HasEggToFoodBird == true
-    then
-        DraftCombination.addFact("RAVEN_ENGINE");
-        log("Raven-style egg conversion engine detected");
-}
-
-rule "DetectFoodSupport" {
-    when
-        DraftCombination.RequiredFoodAvailable == true
-    then
-        DraftCombination.addFact("FOOD_SUPPORTED");
-        log("Birdfeeder supports opening birds");
-}
-
-rule "DetectTopTierBird" {
-    when
-        DraftCombination.HasSTierBird == true
-    then
-        DraftCombination.addFact("TOP_TIER_BIRD");
-        log("Top-tier bird detected");
-}
-
-rule "DetectHighTierBird" {
-    when
-        DraftCombination.HasATierBird == true
-    then
-        DraftCombination.addFact("HIGH_TIER_BIRD");
-        log("High-tier (A-tier) bird detected");
-}
-
-rule "DetectActivationPowerBird" {
-    when
-        DraftCombination.HasBrownOrPinkPowerBird == true
-    then
-        DraftCombination.addFact("ACTIVATION_POWER_BIRD");
+        add_fact("ACTIVATION_POWER_BIRD");
         log("Bird with brown or pink activation power detected in opening");
 }
 
-rule "CountExpensiveBirds" {
+rule "DetectCardDrawEngine" no-loop {
     when
-        DraftCombination.ExpensiveBirdCount >= 2
+        DraftCombination.has_wetlands_card_draw_bird == true
     then
-        DraftCombination.addFact("EXPENSIVE_OPENING");
-        log("Opening contains multiple expensive birds");
+        add_fact("CARD_ENGINE");
+        log("Wetlands card draw engine detected");
 }
 
-rule "CountBonusMatches" {
+rule "DetectCheapBird" no-loop {
     when
-        DraftCombination.BonusMatchCount >= 2
+        DraftCombination.cheap_bird_count > 0
     then
-        DraftCombination.addFact("BONUS_SUPPORTED");
-        log("Bonus card supported by opening birds");
+        add_fact("CHEAP_BIRD");
+        log("Opening contains cheap early-game bird");
 }
 
-rule "DetectDeadOpening" {
+rule "DetectDeadOpening" no-loop {
     when
-        DraftCombination.PlayableBirdCount == 0
+        DraftCombination.playable_bird_count == 0
     then
-        DraftCombination.addFact("DEAD_OPENING");
+        add_fact("DEAD_OPENING");
         log("No playable birds detected");
+}
+
+rule "DetectExpensiveOpening" no-loop {
+    when
+        DraftCombination.expensive_bird_count >= 2
+    then
+        add_fact("EXPENSIVE_OPENING");
+        log("Expensive opening detected (2+ birds with high cost)");
+}
+
+rule "DetectBonusSynergy" no-loop {
+    when
+        DraftCombination.bonus_match_count >= 2
+    then
+        add_fact("BONUS_SUPPORTED");
+        log("Bonus synergy detected (2+ birds match bonus)");
+}
+
+rule "DetectFoodEngine" no-loop {
+    when
+        DraftCombination.has_food_generation_bird == true
+    then
+        add_fact("FOOD_ENGINE");
+        log("Food engine detected");
+}
+
+rule "DetectFoodSupport" no-loop {
+    when
+        DraftCombination.required_food_available == true
+    then
+        add_fact("FOOD_SUPPORTED");
+        log("Birdfeeder supports opening birds");
+}
+
+rule "DetectHighTierBird" no-loop {
+    when
+        DraftCombination.has_a_tier_bird == true
+    then
+        add_fact("HIGH_TIER_BIRD");
+        log("High-tier (A-tier) bird detected");
+}
+
+rule "DetectRavenEngine" no-loop {
+    when
+        DraftCombination.has_egg_to_food_bird == true
+    then
+        add_fact("RAVEN_ENGINE");
+        log("Raven-style egg conversion engine detected");
+}
+
+rule "DetectTopTierBird" no-loop {
+    when
+        DraftCombination.has_s_tier_bird == true
+    then
+        add_fact("TOP_TIER_BIRD");
+        log("Top-tier bird detected");
 }
 ```
 
-##### Pravila sa _accumulate_:
+##### Pravila sa _accumulate_*:
 
 ```
 rule "CountPlayableBirds" {
@@ -486,177 +478,151 @@ rule "DetectTurn1PlayableBird" {
 ### Nivo 2 - Strateško izvođenje činjenica
 
 ```
-rule "DeriveHighTempoOpening" {
+rule "DeriveHighTempoOpening" no-loop {
     when
-        DraftCombination.hasFact("TURN1_PLAYABLE") &&
-        DraftCombination.hasFact("CHEAP_BIRD")
+        DraftCombination.has_turn1_playable_bird == true &&
+        has_fact("CHEAP_BIRD") == true
     then
-        DraftCombination.addFact("HIGH_TEMPO");
+        add_derived_fact("HIGH_TEMPO");
         log("High-tempo opening derived");
 }
 
-rule "DeriveWetlandsCycling" {
+rule "DeriveWetlandsCycling" no-loop {
     when
-        DraftCombination.hasFact("CARD_ENGINE") &&
-        DraftCombination.hasFact("FOOD_SUPPORTED")
+        has_fact("CARD_ENGINE") == true &&
+        has_fact("FOOD_SUPPORTED") == true
     then
-        DraftCombination.addFact("WETLANDS_CYCLING");
+        add_derived_fact("WETLANDS_CYCLING");
         log("Wetlands cycling engine derived");
 }
 
-rule "DeriveRavenCombo" {
+rule "DeriveRavenCombo" no-loop {
     when
-        DraftCombination.hasFact("RAVEN_ENGINE") &&
-        DraftCombination.hasFact("TURN1_PLAYABLE")
+        has_fact("RAVEN_ENGINE") == true &&
+        DraftCombination.has_turn1_playable_bird == true
     then
-        DraftCombination.addFact("RAVEN_COMBO");
+        add_derived_fact("RAVEN_COMBO");
         log("Raven combo opening derived");
 }
 
-rule "DerivePremiumOpening" {
+rule "DerivePremiumOpening" no-loop {
     when
-        DraftCombination.hasFact("TOP_TIER_BIRD") &&
-        DraftCombination.hasFact("TURN1_PLAYABLE")
+        has_fact("TOP_TIER_BIRD") == true &&
+        DraftCombination.has_turn1_playable_bird == true
     then
-        DraftCombination.addFact("PREMIUM_OPENING");
+        add_derived_fact("PREMIUM_OPENING");
         log("Premium opening derived");
 }
 
-rule "DeriveGoodTierOpening" {
+rule "DeriveGoodTierOpening" no-loop {
     when
-        DraftCombination.hasFact("HIGH_TIER_BIRD") &&
-        DraftCombination.hasFact("TURN1_PLAYABLE")
+        has_fact("HIGH_TIER_BIRD") == true &&
+        DraftCombination.has_turn1_playable_bird == true
     then
-        DraftCombination.addFact("GOOD_TIER_OPENING");
+        add_derived_fact("GOOD_TIER_OPENING");
         log("Good-tier opening derived (A-tier bird playable on turn 1)");
 }
 
-rule "DeriveEngineOpening" {
+rule "DeriveEngineOpening" no-loop {
     when
-        DraftCombination.hasFact("ACTIVATION_POWER_BIRD") &&
-        DraftCombination.hasFact("FOOD_SUPPORTED")
+        has_fact("ACTIVATION_POWER_BIRD") == true &&
+        has_fact("FOOD_SUPPORTED") == true
     then
-        DraftCombination.addFact("ENGINE_OPENING");
+        add_derived_fact("ENGINE_OPENING");
         log("Engine-capable opening derived (activation power bird with food support)");
-}
-
-rule "DeriveSlowOpening" {
-    when
-        DraftCombination.hasFact("EXPENSIVE_OPENING")
-    then
-        DraftCombination.addFact("SLOW_OPENING");
-        log("Slow opening derived");
-}
-
-rule "DeriveBonusSynergy" {
-    when
-        DraftCombination.hasFact("BONUS_SUPPORTED")
-    then
-        DraftCombination.addFact("BONUS_SYNERGY");
-        log("Bonus synergy derived");
 }
 ```
 
 ### Nivo 3 - Završna strateška evaluacija
 
 ```
-rule "EvaluateHighTempoOpening" {
+rule "EvaluateHighTempoOpening" no-loop {
     when
-        DraftCombination.hasFact("HIGH_TEMPO")
+        has_derived_fact("HIGH_TEMPO") == true
     then
-        DraftCombination.addScore(10.0);
-        DraftCombination.addTag("HIGH_TEMPO");
-        DraftCombination.addReason("Fast early-game development");
+        add_score(10.0);
+        add_tag("HIGH_TEMPO");
+        add_reason("Fast early-game development");
         log("High-tempo opening evaluated");
 }
 
-rule "EvaluateWetlandsCycling" {
+rule "EvaluateWetlandsCycling" no-loop {
     when
-        DraftCombination.hasFact("WETLANDS_CYCLING")
+        has_derived_fact("WETLANDS_CYCLING") == true
     then
-        DraftCombination.addScore(14.0);
-        DraftCombination.addTag("CARD_ENGINE");
-        DraftCombination.addReason("Strong wetlands card engine");
+        add_score(14.0);
+        add_tag("CARD_ENGINE");
+        add_reason("Strong wetlands card engine");
         log("Wetlands cycling opening evaluated");
 }
 
-rule "EvaluateRavenCombo" {
+rule "EvaluateRavenCombo" no-loop {
     when
-        DraftCombination.hasFact("RAVEN_COMBO")
+        has_derived_fact("RAVEN_COMBO") == true
     then
-        DraftCombination.addScore(16.0);
-        DraftCombination.addTag("RAVEN_ENGINE");
-        DraftCombination.addReason("Egg-to-food conversion engine enables flexible resource cycling");
+        add_score(16.0);
+        add_tag("RAVEN_ENGINE");
+        add_reason("Egg-to-food conversion engine enables flexible resource cycling");
         log("Raven combo evaluated");
 }
 
-rule "EvaluatePremiumOpening" {
+rule "EvaluatePremiumOpening" no-loop {
     when
-        DraftCombination.hasFact("PREMIUM_OPENING")
+        has_derived_fact("PREMIUM_OPENING") == true
     then
-        DraftCombination.addScore(12.0);
-        DraftCombination.addTag("PREMIUM_OPENING");
-        DraftCombination.addReason("Contains top-tier playable bird");
+        add_score(12.0);
+        add_tag("PREMIUM_OPENING");
+        add_reason("Contains top-tier playable bird");
         log("Premium opening evaluated");
 }
 
-rule "EvaluateGoodTierOpening" {
+rule "EvaluateGoodTierOpening" no-loop {
     when
-        DraftCombination.hasFact("GOOD_TIER_OPENING")
+        has_derived_fact("GOOD_TIER_OPENING") == true
     then
-        DraftCombination.addScore(8.0);
-        DraftCombination.addTag("GOOD_TIER_OPENING");
-        DraftCombination.addReason("Contains a playable A-tier bird with strong board presence");
+        add_score(8.0);
+        add_tag("GOOD_TIER_OPENING");
+        add_reason("Contains a playable A-tier bird with strong board presence");
         log("Good-tier opening evaluated");
 }
 
-rule "EvaluateEngineOpening" {
+rule "EvaluateEngineOpening" no-loop {
     when
-        DraftCombination.hasFact("ENGINE_OPENING")
+        has_derived_fact("ENGINE_OPENING") == true
     then
-        DraftCombination.addScore(9.0);
-        DraftCombination.addTag("ENGINE_OPENING");
-        DraftCombination.addReason("Opening contains a brown/pink power bird supported by birdfeeder food");
+        add_score(9.0);
+        add_tag("ENGINE_OPENING");
+        add_reason("Opening contains a brown/pink power bird supported by birdfeeder food");
         log("Engine opening evaluated");
 }
 
-rule "EvaluateBonusSynergy" {
+rule "EvaluateBonusSynergy" no-loop {
     when
-        DraftCombination.hasFact("BONUS_SYNERGY")
+        has_fact("BONUS_SUPPORTED") == true
     then
-        DraftCombination.addScore(5.0);
-        DraftCombination.addTag("BONUS_SYNERGY");
-        DraftCombination.addReason("2+ opening birds match bonus card criteria - solid long-term scoring alignment");
+        add_score(5.0);
+        add_tag("BONUS_SYNERGY");
+        add_reason("2+ opening birds match bonus card criteria - solid long-term scoring alignment");
         log("Bonus synergy evaluated");
 }
 
-rule "EvaluateStrongBonusAlignment" {
+rule "EvaluateSlowOpening" no-loop {
     when
-        DraftCombination.hasFact("STRONG_BONUS_ALIGNMENT")
+        has_fact("EXPENSIVE_OPENING") == true
     then
-        DraftCombination.addScore(8.0);
-        DraftCombination.addTag("STRONG_BONUS_ALIGNMENT");
-        DraftCombination.addReason("3+ opening birds match bonus card criteria - excellent end-game scoring path");
-        log("Strong bonus alignment evaluated");
-}
-
-rule "EvaluateSlowOpening" {
-    when
-        DraftCombination.hasFact("SLOW_OPENING")
-    then
-        DraftCombination.addScore(-8.0);
-        DraftCombination.addTag("SLOW_OPENING");
-        DraftCombination.addReason("Opening is too resource intensive");
+        add_score(-8.0);
+        add_tag("SLOW_OPENING");
+        add_reason("Opening is too resource intensive");
         log("Slow opening evaluated");
 }
 
-rule "EvaluateDeadOpening" {
+rule "EvaluateDeadOpening" no-loop {
     when
-        DraftCombination.hasFact("DEAD_OPENING")
+        has_fact("DEAD_OPENING") == true
     then
-        DraftCombination.addScore(-15.0);
-        DraftCombination.addTag("DEAD_OPENING");
-        DraftCombination.addReason("No early playable birds");
+        add_score(-15.0);
+        add_tag("DEAD_OPENING");
+        add_reason("No early playable birds");
         log("Dead opening evaluated");
 }
 ```
