@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    big_bird_brain_app_lib::run()
+    big_bird_brain_lib::run()
 }

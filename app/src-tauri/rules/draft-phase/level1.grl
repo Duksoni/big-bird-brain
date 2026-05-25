@@ -1,0 +1,87 @@
+rule "DetectActivationPowerBird" no-loop {
+    when
+        DraftCombination.has_brown_or_pink_power_bird == true
+    then
+        add_fact("ACTIVATION_POWER_BIRD");
+        log("Bird with brown or pink activation power detected in opening");
+}
+
+rule "DetectCardDrawEngine" no-loop {
+    when
+        DraftCombination.has_wetlands_card_draw_bird == true
+    then
+        add_fact("CARD_ENGINE");
+        log("Wetlands card draw engine detected");
+}
+
+rule "DetectCheapBird" no-loop {
+    when
+        DraftCombination.cheap_bird_count > 0
+    then
+        add_fact("CHEAP_BIRD");
+        log("Opening contains cheap early-game bird");
+}
+
+rule "DetectDeadOpening" no-loop {
+    when
+        DraftCombination.playable_bird_count == 0
+    then
+        add_fact("DEAD_OPENING");
+        log("No playable birds detected");
+}
+
+rule "DetectExpensiveOpening" no-loop {
+    when
+        DraftCombination.expensive_bird_count >= 2
+    then
+        add_fact("EXPENSIVE_OPENING");
+        log("Expensive opening detected (2+ birds with high cost)");
+}
+
+rule "DetectBonusSynergy" no-loop {
+    when
+        DraftCombination.bonus_match_count >= 2
+    then
+        add_fact("BONUS_SUPPORTED");
+        log("Bonus synergy detected (2+ birds match bonus)");
+}
+
+rule "DetectFoodEngine" no-loop {
+    when
+        DraftCombination.has_food_generation_bird == true
+    then
+        add_fact("FOOD_ENGINE");
+        log("Food engine detected");
+}
+
+rule "DetectFoodSupport" no-loop {
+    when
+        DraftCombination.required_food_available == true
+    then
+        add_fact("FOOD_SUPPORTED");
+        log("Birdfeeder supports opening birds");
+}
+
+rule "DetectHighTierBird" no-loop {
+    when
+        DraftCombination.has_a_tier_bird == true
+    then
+        add_fact("HIGH_TIER_BIRD");
+        log("High-tier (A-tier) bird detected");
+}
+
+rule "DetectRavenEngine" no-loop {
+    when
+        DraftCombination.has_egg_to_food_bird == true
+    then
+        add_fact("RAVEN_ENGINE");
+        log("Raven-style egg conversion engine detected");
+}
+
+rule "DetectTopTierBird" no-loop {
+    when
+        DraftCombination.has_s_tier_bird == true
+    then
+        add_fact("TOP_TIER_BIRD");
+        log("Top-tier bird detected");
+}

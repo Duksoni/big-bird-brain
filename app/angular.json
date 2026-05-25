@@ -3,10 +3,11 @@
   "version": 1,
   "newProjectRoot": "projects",
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "packageManager": "bun"
   },
   "projects": {
-    "big-bird-brain-app": {
+    "big-bird-brain": {
       "projectType": "application",
       "root": "",
       "sourceRoot": "src",
@@ -15,12 +16,20 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/big-bird-brain-app",
+            "outputPath": "dist/big-bird-brain",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": [
+              "zone.js",
+              "@angular/localize/init"
+            ],
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/assets"]
+            "assets": [
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ]
           },
           "configurations": {
             "production": {
@@ -49,14 +58,15 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
+            "host": "0.0.0.0",
             "port": 1420
           },
           "configurations": {
             "production": {
-              "buildTarget": "big-bird-brain-app:build:production"
+              "buildTarget": "big-bird-brain:build:production"
             },
             "development": {
-              "buildTarget": "big-bird-brain-app:build:development"
+              "buildTarget": "big-bird-brain:build:development"
             }
           },
           "defaultConfiguration": "development"

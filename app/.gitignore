@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /bazel-out
+.angular
 
 # Node
 /node_modules
@@ -41,4 +42,5 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.env
+# Downloaded the project locally to get better source code inspection
+rust-rule-engine/

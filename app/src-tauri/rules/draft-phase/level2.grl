@@ -1,0 +1,53 @@
+rule "DeriveHighTempoOpening" no-loop {
+    when
+        DraftCombination.has_turn1_playable_bird == true &&
+        has_fact("CHEAP_BIRD") == true
+    then
+        add_derived_fact("HIGH_TEMPO");
+        log("High-tempo opening derived");
+}
+
+rule "DeriveWetlandsCycling" no-loop {
+    when
+        has_fact("CARD_ENGINE") == true &&
+        has_fact("FOOD_SUPPORTED") == true
+    then
+        add_derived_fact("WETLANDS_CYCLING");
+        log("Wetlands cycling engine derived");
+}
+
+rule "DeriveRavenCombo" no-loop {
+    when
+        has_fact("RAVEN_ENGINE") == true &&
+        DraftCombination.has_turn1_playable_bird == true
+    then
+        add_derived_fact("RAVEN_COMBO");
+        log("Raven combo opening derived");
+}
+
+rule "DerivePremiumOpening" no-loop {
+    when
+        has_fact("TOP_TIER_BIRD") == true &&
+        DraftCombination.has_turn1_playable_bird == true
+    then
+        add_derived_fact("PREMIUM_OPENING");
+        log("Premium opening derived");
+}
+
+rule "DeriveGoodTierOpening" no-loop {
+    when
+        has_fact("HIGH_TIER_BIRD") == true &&
+        DraftCombination.has_turn1_playable_bird == true
+    then
+        add_derived_fact("GOOD_TIER_OPENING");
+        log("Good-tier opening derived (A-tier bird playable on turn 1)");
+}
+
+rule "DeriveEngineOpening" no-loop {
+    when
+        has_fact("ACTIVATION_POWER_BIRD") == true &&
+        has_fact("FOOD_SUPPORTED") == true
+    then
+        add_derived_fact("ENGINE_OPENING");
+        log("Engine-capable opening derived (activation power bird with food support)");
+}
