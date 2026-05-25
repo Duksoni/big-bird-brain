@@ -4,7 +4,9 @@ use sqlx::{
     sqlite::{SqliteConnectOptions, SqlitePoolOptions},
 };
 use std::str::FromStr;
-use tauri::{App, Manager};
+use tauri::{App, Manager, async_runtime::Mutex};
+
+use crate::rule_engine::RuleEngine;
 
 pub async fn init_db(connection_string: &str) -> anyhow::Result<SqlitePool> {
     let options = SqliteConnectOptions::from_str(connection_string)?.create_if_missing(true);
@@ -42,6 +44,7 @@ pub fn setup_app(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
             .expect("failed to run migrations");
 
         app_handle.manage(pool);
+        app_handle.manage(Mutex::new(RuleEngine::new_draft().unwrap()));
     });
 
     Ok(())
